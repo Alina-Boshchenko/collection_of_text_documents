@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>HTML5 форма обратной связи</title>
+	<link rel="stylesheet" media="screen" href="styles.css" >
+	<meta name="robots" content="noindex, nofollow">
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-58D8JKQ');</script>
+    <!-- End Google Tag Manager -->
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-58D8JKQ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+<form class="contact_form" action="#" method="post" name="contact_form">
+    <ul>
+        <li>
+             <h2>Напишите нам</h2>
+             <span class="required_notification">* поля обязательные к заполнению</span>
+        </li>
+        <li>
+            <label for="name">Имя:</label>
+            <input type="text"  placeholder="Петров Александр" required />
+        </li>
+        <li>
+            <label for="email">Email:</label>
+            <input type="email" name="email" placeholder="name@sitehere.ru" required />
+            <span class="form_hint">Например "name@sitehere.ru"</span>
+        </li>
+        <li>
+            <label for="website">Веб-сайт:</label>
+            <input type="url" name="website" placeholder="//sitehere.ru" required pattern="(http|https)://.+"/>
+            <span class="form_hint">Например "//sitehere.ru"</span>
+        </li>
+        <li>
+            <label for="message">Сообщение:</label>
+            <textarea name="message" cols="40" rows="6" required ></textarea>
+        </li>
+        <li>
+        	<button class="submit" type="submit">Отправить</button>
+        </li>
+    </ul>
+</form>
+
+</body>
+</html>

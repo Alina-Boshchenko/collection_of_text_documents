@@ -1,0 +1,12 @@
+<style>
+    input:required {
+        border-style:solid;
+        border-width:thick;
+    }
+    input:valid {
+        background-color: #adff2f;
+    }
+    input:invalid {
+        background-color: #f08080;
+    }
+</style>

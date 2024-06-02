@@ -1,13 +1,23 @@
 package org.example;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        CollectionTextDocuments c = new CollectionTextDocuments(new File("C:/Users/Алина/Desktop/РГРТУ"));
-        c.checkAbsoluteFileOfList();
-        c.openFileForName("Результат агрохимического исследования.txt");
+        CollectionTextDocuments c = new CollectionTextDocuments(new File("catalog_for_the_test"));
+
+        System.out.println(c.checkCollection()); // дерево каталогов
+
+        System.out.println("------------------ Файл PDF -------------------------");
+        System.out.println(c.openFileForName("ispolzovanie-dereviev.pdf"));
+
+        System.out.println("------------------ Файл TXT -------------------------");
+        System.out.println(c.openFileForName("ascii.txt"));
+
+        System.out.println("------------------ Файл DOCX ------------------------");
+        System.out.println(c.openFileForName("Доклад.docx"));
+
+        System.out.println("-----------------------------------------------------");
+
     }
 }

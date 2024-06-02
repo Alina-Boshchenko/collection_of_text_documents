@@ -1,0 +1,30 @@
+<h1>Вход/Регистрация</h1>
+<p>Данные формы можно использовать для регистрации или входа на сайт.</p>
+<h2>Логин</h2>
+ 
+<form action="" autocomplete="off">
+    <label for="username">Имя пользователя</label>
+    <input id="username" name="username" pattern="[a-zA-Z0-9]{5,}" title="Минимум 5 букв или цифр" required="">
+ 
+    <label for="password">Пароль</label>
+    <input id="password" name="password" pattern=".{5,}" title="Минимум 5 букв или цифр" required="" type="password">
+ 
+    <p><input class="btn" value="Вход" type="submit"></p>
+</form>
+ 
+<h2>Регистрация</h2>
+<form action="" autocomplete="off">
+    <label for="username2">Имя пользователя</label>
+    <input id="username2" name="username" pattern="[a-zA-Z0-9]{5,}" title="Минимум 5 букв или цифр" required="">
+ 
+    <label for="password2">Пароль</label>
+    <input id="password2" name="password" pattern=".{5,}" title="Минимум 5 букв или цифр" required="" type="password">
+ 
+    <label for="email">E-mail</label>
+    <input id="email" name="email" required="" type="email">
+ 
+    <label for="url">Ваш сайт</label>
+    <input id="url" name="url" type="url">
+ 
+    <p><input class="btn" value="Регистрация" type="submit"></p>
+</form>
