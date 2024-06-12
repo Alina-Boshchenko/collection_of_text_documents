@@ -1,11 +1,11 @@
 package org.example.enums;
 
-public enum Сatalog {
+public enum FolderType {
 
-    FIRST_FILE_DEFAULT("C:\\");
+    DEFAULT_FOLDER("C:\\");
      private String value;
 
-    Сatalog(String value) {
+    FolderType(String value) {
         this.value = value;
     }
 

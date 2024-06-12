@@ -1,47 +1,38 @@
 package org.example.impl;
 
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.parser.PdfTextExtractor;
-import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
-import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.example.enums.Сatalog;
+import org.example.enums.FolderType;
 
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.StringJoiner;
+import java.util.*;
+
 
 public class CollectionTextDocuments {
-    private Map<String, File> files;
-    private static final File FIRST_FILE_DEFAULT = new File(Сatalog.FIRST_FILE_DEFAULT.getValue());
+    private List<Path> files;
+    private static final Path DEFAULT_FOLDER = Paths.get(FolderType.DEFAULT_FOLDER.getValue());
     private static final String HEADING = "Коллекция документов:\n";
     private StringBuffer stringBuffer;
     private String indent;
-    private int pageNumber;
 
-// констр
     public CollectionTextDocuments() {
-        files = new HashMap<>();
+        files = new ArrayList<>();
         indent = "";
         stringBuffer = new StringBuffer(HEADING);
-        pageNumber = 1;
     }
-
-    // обход с помощью пакета nio
-    public void crawlingFilesUsingNIO() throws IOException {
-        crawlingFilesNIO(FIRST_FILE_DEFAULT.toPath());
+    public void traversingDirectoryTree() {
+        try {
+            crawlingFilesNIO(DEFAULT_FOLDER);
+        } catch (IOException e) {
+            System.err.println(e);
+        }
     }
-    public void crawlingFilesUsingNIO(File firstFile) throws IOException {
-        crawlingFilesNIO(firstFile.toPath());
+    public void traversingDirectoryTree(String nameFile) {
+        try {
+            crawlingFilesNIO(Paths.get(nameFile));
+        } catch (IOException e) {
+            System.err.println(e);
+        }
     }
     private void crawlingFilesNIO(Path path) throws IOException {
         Files.walkFileTree(path, new FileVisitor<Path>() {
@@ -51,144 +42,158 @@ public class CollectionTextDocuments {
                 stringBuffer.append(String.format("%s Папка: %s\n",indent,dir.toFile().getName()));
                 return FileVisitResult.CONTINUE;
             }
-
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                 stringBuffer.append(String.format("%s Файл: %s\n",indent,file.toFile().getName()));
-                files.put(file.toFile().getName(), file.toFile());
+                files.add(file);
                 return FileVisitResult.CONTINUE;
             }
-
             @Override
             public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
                 System.out.println("Не удалось просмотреть файл");
                 return FileVisitResult.CONTINUE;
             }
-
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                 return FileVisitResult.CONTINUE;
             }
         });
     }
+    public String collectionStructure() {
+        return stringBuffer.toString();
+    }
 
-    // обход рекурсивный
-    public void crawlingFilesWithRecursion(File firstFile){
-        traversingFilesWithRecursion(firstFile, files, stringBuffer, indent);
+    public void printAbsolutePathOfList() {
+        files.forEach(System.out::println);
     }
-    public void crawlingFilesWithRecursion(){
-        traversingFilesWithRecursion(FIRST_FILE_DEFAULT, files, stringBuffer, indent);
+
+
+
+private Path searchForName(String nameFile){
+        return files.stream().filter(el -> el.toFile().getName().equals(nameFile)).findFirst().get();
+}
+
+private String getFileExtension(String nameFile){
+    int indexOfTheLastPoint = nameFile.lastIndexOf('.');
+    if(indexOfTheLastPoint == -1){
+        return "Расширение не определено";
+    } return nameFile.substring(indexOfTheLastPoint);
+}
+
+
+    public String open(String nameFile) {
+        Path path = searchForName(nameFile);
+        String extension = getFileExtension(nameFile);
+        switch (extension){
+            case ".txt" -> {
+                return new Txt().open(path);
+            }
+            case ".pdf" -> {
+                return new Pdf().open(path);
+            }
+            case ".docx" -> {
+                return new Docx().open(path);
+            }
+            default -> {
+                return null;
+            }
+        }
     }
-    private void traversingFilesWithRecursion(File firstFile, Map<String, File> files, StringBuffer strBuff, String indent) {
-        if (firstFile.isDirectory()) {
-            File[] filesOfDirectory = firstFile.listFiles();
-            if (filesOfDirectory != null) {
-                for (File file : filesOfDirectory) {
-                    if (file.isDirectory()) {
-                        indent += "   ";
-                        strBuff.append(String.format("%s Папка: %s\n",indent,file.getName()));
-                        traversingFilesWithRecursion(file, files, strBuff, indent);
-                    } else {
-                        strBuff.append(String.format("%s Файл: %s\n",indent,file.getName()));
-                        files.put(file.getName(), file);
-                    }
+    public void search(String nameFile, String word){
+        Path path = searchForName(nameFile);
+        new Txt().search(path,word);
+    }
+
+    public boolean replace(String nameFile, String oldValue, String newValue){
+        Path pathOld = searchForName(nameFile);
+        Path pathNew = new Txt().replace(pathOld,oldValue,newValue);
+        return files.add(pathNew);
+    }
+
+    public boolean createFile(String pathToTheFile) {
+        Path pathNew = new Txt().createFile(pathToTheFile);
+        return files.add(pathNew);
+    }
+
+    public void documentSize(String nameFile) {
+        Path path = searchForName(nameFile);
+        try {
+            System.out.println(Files.getAttribute(path, "dos:size")+" байт");
+        } catch (IOException e) {
+            System.err.println(e);
+        }
+    }
+    public void documentOwner(String nameFile) {
+        Path path = searchForName(nameFile);
+        try {
+            System.out.println(Files.getOwner(path).getName());
+        } catch (IOException e) {
+            System.err.println(e);
+        }
+    }
+    public void documentCreationTime(String nameFile) {
+        Path path = searchForName(nameFile);
+        try {
+            System.out.println("Дата и время создания "+Files.getAttribute(path, "dos:creationTime"));
+        } catch (IOException e) {
+            System.err.println(e);
+        }
+    }
+
+    public List<Path> sortingByOwner(){
+           return files.stream().sorted((el1,el2) -> {
+                try {
+                    return Files.getOwner(el1).getName()
+                            .compareTo(Files.getOwner(el2).getName());
+                } catch (IOException e) {
+                    throw new RuntimeException();
                 }
+            }).toList();
+    }
+    public List<Path> sortingBySize(){
+        return files.stream().sorted((el1,el2) -> {
+            try {
+                if (Files.size(el1) > Files.size(el2)){
+                    return 1;
+                } else if (Files.size(el1)<Files.size(el2)) {
+                    return -1;
+                } else return 0;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } else files.put(firstFile.getName(), firstFile);
+        }).toList();
     }
-
-
-
-//показать дерево коллекции
-    public StringBuffer checkCollection() {
-        return stringBuffer;
-    }
-
-    public void checkAbsoluteFileOfList() {
-        for (String string : files.keySet()) {
-            System.out.println(string);
-        }
-    }
-
-
-
-
-
-// вместо этого метода свич с выборкой по концу файла
-    public String openFileForName(String nameFile) {
-        if (nameFile.contains(".pdf")) {
-            return openFilePdf(nameFile);
-        } else if (nameFile.contains(".txt")) {
-            return openFileTxt(nameFile);
-        } else if (nameFile.contains(".png")) {
-            return null;
-        } else if (nameFile.contains(".docx")) {
-            return openFileDocx(nameFile);
-        } return nameFile;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-// ---------------- сделаю интерфейс и отдельные реализации под каждый формат ----------------------- //
-
-    private String openFilePdf(String nameFile) {
-        String text = "";
-        try {
-            //конструктор по имени файла
-            PdfReader reader = new PdfReader(files.get(nameFile).getAbsolutePath());
-            for (int i = 1; i <= reader.getNumberOfPages(); ++i) { // i - номер страницы
-                TextExtractionStrategy strategy = new SimpleTextExtractionStrategy(); //Создает новый инструмент визуализации извлечения текста.
-                text += PdfTextExtractor.getTextFromPage(reader, i, strategy);  // Извлекает текст из PDF-файла. Извлеките текст с указанной страницы, используя стратегию извлечения.
+    public List<Path> sortingByCreationTime(){
+        return files.stream().sorted((el1,el2) -> {
+            try {
+                return Files.getAttribute(el1,"dos:creationTime").toString()
+                        .compareTo(Files.getAttribute(el2,"dos:creationTime").toString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            reader.close();
-        } catch (IOException e) {
-            System.err.println(e);
-        }
-        return text;
+        }).toList();
     }
-
-    private String openFileTxt(String nameFile) {
-        StringJoiner strJ = new StringJoiner("\n");
-        try (Scanner scanner = new Scanner(Paths.get(files.get(nameFile).getAbsolutePath()),"UTF-8")) {
-            while (scanner.hasNextLine()) {
-                strJ.add(scanner.nextLine());
-            }
-        } catch (IOException e) {
-            System.err.println(e);
-        }
-        return strJ.toString();
-    }
-
-    private String openFileDocx(String nameFile){
-        String text = "";
-        try {
-            XWPFDocument docxFile = new XWPFDocument(OPCPackage.open(files.get(nameFile)));
-            XWPFWordExtractor extractor = new XWPFWordExtractor(docxFile);
-            text = extractor.getText();
-        } catch (IOException | InvalidFormatException e) {
-            System.err.println("Ошибка"+e);
-        }
-        return text;
+    public int quantityOfDocuments(){
+        return files.size();
     }
 
 
 
-// replac - заменить
-    // create - создать
-    public void documentSearch(String nameFile, String word){
 
 
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 
