@@ -1,8 +1,8 @@
-package org.example.enums;
+package org.example.entities.enums;
 
 public enum FolderType {
 
-    DEFAULT_FOLDER("C:\\");
+    DEFAULT_FOLDER("catalog_for_the_test");
      private String value;
 
     FolderType(String value) {

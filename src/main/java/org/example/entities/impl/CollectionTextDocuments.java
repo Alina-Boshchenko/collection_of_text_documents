@@ -1,6 +1,6 @@
-package org.example.impl;
+package org.example.entities.impl;
 
-import org.example.enums.FolderType;
+import org.example.entities.enums.FolderType;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -9,17 +9,25 @@ import java.util.*;
 
 
 public class CollectionTextDocuments {
+
+    private static CollectionTextDocuments instance = new CollectionTextDocuments();
+
     private List<Path> files;
     private static final Path DEFAULT_FOLDER = Paths.get(FolderType.DEFAULT_FOLDER.getValue());
     private static final String HEADING = "Коллекция документов:\n";
     private StringBuffer stringBuffer;
     private String indent;
 
-    public CollectionTextDocuments() {
+    public static CollectionTextDocuments getInstance(){
+        return instance;
+    }
+
+    private CollectionTextDocuments() {
         files = new ArrayList<>();
         indent = "";
         stringBuffer = new StringBuffer(HEADING);
     }
+
     public void traversingDirectoryTree() {
         try {
             crawlingFilesNIO(DEFAULT_FOLDER);
